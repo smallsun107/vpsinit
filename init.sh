@@ -73,5 +73,30 @@ else
     warn "当前内核不支持 BBR，已跳过"
 fi
 
+if [ "${1:-}" = "3xui" ]; then
+    info "安装 3x-ui"
+    mkdir -p /root/3x-ui/{db,cert,acme}
+    cat > /root/3x-ui/compose.yml <<'EOF'
+services:
+  3xui:
+    image: ghcr.io/mhsanaei/3x-ui:latest
+    container_name: 3x-ui
+    network_mode: host
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - /root/3x-ui/db:/etc/x-ui
+      - /root/3x-ui/cert:/root/cert
+      - /root/3x-ui/acme:/root/.acme.sh
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+      XUI_ENABLE_FAIL2BAN: "true"
+EOF
+    docker compose -f /root/3x-ui/compose.yml up -d
+    ok "3x-ui 已启动，配置文件：/root/3x-ui/compose.yml"
+fi
+
 echo
 ok "安装完成。请注销后重新登录以使用 zsh。"
