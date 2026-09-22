@@ -30,8 +30,13 @@ apt install -y sudo curl git tmux gcc neovim zsh ca-certificates
 # zsh + oh-my-zsh
 info "配置 zsh"
 chsh -s "$(command -v zsh)"
-curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh |
-    RUNZSH=no CHSH=no sh -s -- --unattended
+
+if [ -d /root/.oh-my-zsh ]; then
+    info "Oh My Zsh 已存在，跳过安装"
+else
+    curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh |
+        RUNZSH=no CHSH=no sh -s -- --unattended
+fi
 
 # Docker
 info "配置 Docker 源"
@@ -52,7 +57,7 @@ apt update
 apt install -y docker-ce docker-ce-cli containerd.io \
     docker-buildx-plugin docker-compose-plugin
 
-docker run hello-world
+docker run --rm hello-world
 
 # BBR
 info "尝试启用 BBR"
